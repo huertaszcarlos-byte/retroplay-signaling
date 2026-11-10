@@ -1,0 +1,28 @@
+RETROPLAY — SERVIDOR DE SALAS P2P (FASE 1)
+
+Qué incluye
+- Worker de Cloudflare para crear salas con códigos de 6 caracteres.
+- Durable Object por sala para aceptar hasta 2 conexiones WebSocket.
+- Reenvío de señalización: offer, answer e ICE candidates.
+- Endpoint de comprobación: /api/health.
+
+IMPORTANTE
+Esta es la primera capa de conexión, NO el multijugador terminado.
+Todavía falta:
+1. Publicar este Worker en tu cuenta Cloudflare.
+2. Conectar el frontend RetroPlay a la URL de este Worker.
+3. Añadir la negociación WebRTC P2P en el navegador.
+4. Integrar WebRTC con la función netplay del núcleo/emulador.
+5. Probar latencia y compatibilidad Italia–Perú.
+
+No se incluye ningún ROM/BIOS. El servidor no transmite juegos ni garantiza sincronización de Tekken 3.
+
+PUBLICACIÓN
+1. Instala Node.js en un ordenador y ejecuta: npm install -g wrangler
+2. Entra a tu cuenta: npx wrangler login
+3. Descomprime esta carpeta.
+4. Desde esta carpeta ejecuta: npx wrangler deploy
+5. Guarda la dirección *.workers.dev que indique Cloudflare.
+
+LÍMITES
+El servicio usa Durable Objects y WebSockets. El plan gratuito tiene límites y condiciones que pueden cambiar; revisa el panel de Cloudflare antes de usarlo con muchos jugadores.
