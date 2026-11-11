@@ -1,30 +1,67 @@
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    const corsHeaders = {
+      "Access-Control-Allow-Origin": "https://aged-heart-9eb1.huertas-zcarlos.workers.dev",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+      "Vary": "Origin"
+    };
+
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: corsHeaders
+      });
+    }
+
     if (url.pathname === "/api/health") {
-      return Response.json({ ok: true, service: "retroplay-signaling" });
+      return Response.json(
+        { ok: true, service: "retroplay-signaling" },
+        { headers: corsHeaders }
+      );
     }
 
     if (url.pathname === "/api/room/create" && request.method === "POST") {
       const code = makeCode();
       const id = env.ROOMS.idFromName(code);
       const stub = env.ROOMS.get(id);
-      const res = await stub.fetch("https://room.internal/init", { method: "POST" });
-      if (!res.ok) return new Response("No se pudo crear la sala", { status: 500 });
-      return Response.json({ code, role: "host" });
+
+      const res = await stub.fetch(
+        "https://room.internal/init",
+        { method: "POST" }
+      );
+
+      if (!res.ok) {
+        return new Response("No se pudo crear la sala", {
+          status: 500,
+          headers: corsHeaders
+        });
+      }
+
+      return Response.json(
+        { code, role: "host" },
+        { headers: corsHeaders }
+      );
     }
 
     const match = url.pathname.match(/^\/api\/room\/([A-Z0-9]{6})\/ws$/);
+
     if (match && request.headers.get("Upgrade") === "websocket") {
       const code = match[1];
       const id = env.ROOMS.idFromName(code);
       return env.ROOMS.get(id).fetch(request);
     }
 
-    return new Response("RetroPlay signaling API", { status: 200 });
+    return new Response("RetroPlay signaling API", {
+      status: 200,
+      headers: corsHeaders
+    });
   }
 };
+
 
 function makeCode() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
